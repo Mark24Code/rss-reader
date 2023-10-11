@@ -5,6 +5,8 @@ require_relative './utils'
 require 'rss'
 require 'open-uri'
 require 'async'
+require 'async/barrier'
+require 'async/semaphore'
 
 # RSS Channel class
 class RSSChannel
@@ -95,13 +97,20 @@ class RSSManager
 
   def async_fetch
     # use: 2.854694
-    Async do |task|
-      @channels.each do |ch|
-        task.async do
+    barrier = Async::Barrier.new
+
+		Sync do
+			# Only 10 tasks are created at a time:
+			semaphore = Async::Semaphore.new(10, parent: barrier)
+
+      @channels.map do |ch|
+        semaphore.async do
           ch.fetch_channel
         end
-      end
-    end
+      end.map(&:wait)
+		ensure
+			barrier.stop
+		end
   end
 
   def init_pipeline

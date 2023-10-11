@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'rss-reader'
-  s.version     = '1.0.0'
+  s.version     = '1.1.0'
   s.summary     = 'RSS Reader!'
   s.description = 'A simple cli RSS Reader'
   s.authors     = ['Mark24']
